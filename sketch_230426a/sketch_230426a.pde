@@ -1,6 +1,10 @@
 PImage alien;
 PImage tank;
 
+boolean tankLeft = false, tankRight = false;
+
+int tankXPos, tankYPos;
+
 int numOfAliens = 11;
 
 int[] alienXPos = new int[numOfAliens];
@@ -31,5 +35,23 @@ void draw() {
 
   for(int i = 0; i < numOfAliens; i++) {
     image(alien,alienXPos[i],alienYPos[i]);
+  }
+}
+
+void keyPressed() {
+  if(keyCode == 37) {
+    tankLeft = true;
+  }
+  if(keyCode == 39) {
+    tankRight = true;
+  }
+}
+
+void keyReleased() {
+  if(keyCode == 37) {
+    tankLeft = false;
+  }
+  if(keyCode == 39) {
+    tankRight = false;
   }
 }
