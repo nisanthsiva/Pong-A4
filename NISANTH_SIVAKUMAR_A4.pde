@@ -2,7 +2,11 @@
 // Make variable init method for game restart, reset score
 // Fix dimensions of tank
 
+// REDOWNLOAD ALIEN IMAGES, should be .png not .PNG
+
 // Use if else for game state conditionals
+
+// Initialize() method
 
 PImage alien;
 PImage alien1;
@@ -25,6 +29,11 @@ int[][] alienXPos = {new int[numOfAliensPerRow], new int[numOfAliensPerRow], new
 int[][] alienYPos = {new int[numOfAliensPerRow], new int[numOfAliensPerRow], new int[numOfAliensPerRow], new int[numOfAliensPerRow], new int[numOfAliensPerRow]};
 boolean[][] alienAlive = {new boolean[numOfAliensPerRow], new boolean[numOfAliensPerRow], new boolean[numOfAliensPerRow], new boolean[numOfAliensPerRow], new boolean[numOfAliensPerRow]};
 
+//int numOfRows = 5;
+//int[][] alienXPos = new int[numOfRows][numOfAliensPerRow];
+//int[][] alienYPos = new int[numOfRows][numOfAliensPerRow];
+//boolean[][] alienAlive = new boolean[numOfRows][numOfAliensPerRow];
+
 int laserXPos, laserYPos;
 
 int currentTime;
@@ -46,30 +55,33 @@ int numberOfAliensAlive;
 
 void setup() {
   size(800,800);
-  alien = loadImage("alien.PNG");
-  alien1 = loadImage("alien1.PNG");
+  //alien = loadImage("alien.PNG");
+  //alien1 = loadImage("alien1.PNG");
+  alien = loadImage("alien.png");
+  alien1 = loadImage("alien1.png");
   tank = loadImage("tank.png");
   textAlign(CENTER,CENTER);
   imageMode(CENTER);
   rectMode(CENTER);
-    
-  for(int i = 0; i < 5; i++) {
-    for(int j = 0; j < numOfAliensPerRow; j++) {
-      alienAlive[i][j] = true;
-    }
-  }
   
-  for(int i = 0; i < 5; i++) {
-    for(int j = 0; j < numOfAliensPerRow; j++) {
-      alienXPos[i][j] = j*50 + 150;
-    }
-  }
+  initialize();
+  //for(int i = 0; i < 5; i++) {
+  //  for(int j = 0; j < numOfAliensPerRow; j++) {
+  //    alienAlive[i][j] = true;
+  //  }
+  //}
   
-  for(int i = 0; i < 5; i++) {
-    for(int j = 0; j < numOfAliensPerRow; j++) {
-      alienYPos[i][j] = i*35 + 50; //i*35 instead of j*35
-    }
-  }
+  //for(int i = 0; i < 5; i++) {
+  //  for(int j = 0; j < numOfAliensPerRow; j++) {
+  //    alienXPos[i][j] = j*50 + 150;
+  //  }
+  //}
+  
+  //for(int i = 0; i < 5; i++) {
+  //  for(int j = 0; j < numOfAliensPerRow; j++) {
+  //    alienYPos[i][j] = i*35 + 50; //i*35 instead of j*35
+  //  }
+  //}
 
   gameState = 0;
 }
@@ -116,6 +128,9 @@ void instructions() {
 }
 
 void game() {
+  //println(alienHittingMaxYLevel());
+  //println(alienYPos[4][0]);
+  
   background(#000000);
   image(tank,tankXPos,tankYPos);
   drawAliens();
@@ -128,6 +143,7 @@ void game() {
     laserXPos = tankXPos;
     laserYPos = tankYPos-tankHeight;
   } 
+  
   if(laserOnScreen) {
     drawLaser(laserXPos,laserYPos,laserWidth,laserHeight);
     moveLaser();
@@ -139,13 +155,13 @@ void game() {
     //win condition
   }
   
-  //if(alienYPos reaches end of y-cutoff leve) {
-  //  gameState = 3;
-  //  lose condition
-  //}
-  
+  if(alienHittingMaxYLevel()) {
+    gameState = 3;
+    //lose condition
+  }
+
   //println(playerScore);
-  println(numberOfAliensAlive);
+  //println(numberOfAliensAlive);
 }
 
 void endgame() {
@@ -164,6 +180,26 @@ void endgame() {
   text("Return To Main Menu",400,550);
 }
 
+void initialize() {
+  for(int i = 0; i < 5; i++) {
+    for(int j = 0; j < numOfAliensPerRow; j++) {
+      alienAlive[i][j] = true;
+    }
+  }
+  
+  for(int i = 0; i < 5; i++) {
+    for(int j = 0; j < numOfAliensPerRow; j++) {
+      alienXPos[i][j] = j*50 + 150;
+    }
+  }
+  
+  for(int i = 0; i < 5; i++) {
+    for(int j = 0; j < numOfAliensPerRow; j++) {
+      alienYPos[i][j] = i*35 + 50; //i*35 instead of j*35
+    }
+  }
+}
+
 void moveTank() {
   if(tankLeft && tankXPos-tankWidth/2 > 0) {
     tankXPos -= tankSpeed;
@@ -178,7 +214,15 @@ void drawAliens() {
     for(int j = 0; j < numOfAliensPerRow; j++) {
       if(alienAlive[i][j]) {
         if(animationState == 0) {
-          image(alien,alienXPos[i][j],alienYPos[i][j]);
+          //if(i == 0) {
+            //draw first row alien
+          //}
+          //if(i == 1 || i == 2) {
+            image(alien,alienXPos[i][j],alienYPos[i][j]);
+          //}
+          //if(i == 3 || i == 4) {
+            //draw third and fourth row alien
+          //}
         } 
         else if(animationState == 1) {
           image(alien1,alienXPos[i][j],alienYPos[i][j]);
@@ -216,6 +260,17 @@ void checkNumberOfAliensAlive() {
     }
   }
   numberOfAliensAlive = num;
+}
+
+boolean alienHittingMaxYLevel() {
+  for(int i = 0; i < 5; i++) {
+    for(int j = 0; j < numOfAliensPerRow; j++) {
+      if(alienAlive[i][j] && alienYPos[i][j] > 500) {
+        return(true);
+      } 
+    }
+  }
+  return(false);
 }
 
 void checkAlienHittingWall() {
@@ -270,23 +325,7 @@ void checkLaserCollision() {
         laserOnScreen = false;
         alienAlive[i][j] = false;
         numberOfAliensAlive--;
-        //switch(i) {
-        //  case 0:
-        //    playerScore += 30;
-        //    break;
-        //  case 1:
-        //    playerScore += 20;
-        //    break;
-        //  case 2:
-        //    playerScore += 20;
-        //    break;
-        //  case 3:
-        //    playerScore += 10;
-        //    break;
-        //  case 4:
-        //    playerScore += 10;
-        //    break;
-        //}
+
         if(i == 0) {
           playerScore += 30;
         }
@@ -377,6 +416,7 @@ void mousePressed() {
     gameState = 0;
   }
   if(gameState == 3 && mouseX > 340 && mouseX < 460 && mouseY > 485 && mouseY < 515) { // "Play again" to restart game
+    initialize();
     gameState = 2;
   }
   if(gameState == 3 && mouseX > 340 && mouseX < 460 && mouseY > 435 && mouseY < 565) { // "Return to main menu" to return to menu after game ends
