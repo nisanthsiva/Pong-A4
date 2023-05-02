@@ -1,16 +1,9 @@
 // Add small delay when aliens hit wall and change y-level
-// Make variable init method for game restart, reset score
 // Fix dimensions of tank
 
-// REDOWNLOAD ALIEN IMAGES, should be .png not .PNG
-
-// Use if else for game state conditionals
-
-// Initialize() method
-
-PImage alien;
-PImage alien1;
+PImage alienA, alienB, alien1A, alien1B, alien2A, alien2B;
 PImage tank;
+PImage logo;
 
 boolean tankLeft = false, tankRight = false;
 boolean shootLaser = false;
@@ -21,18 +14,14 @@ int alienWidth = 30, alienHeight = 22;
 
 int laserWidth = 4, laserHeight = 26;
 
+int numOfRows = 5;
 int numOfAliensPerRow = 11;
 
 int tankSpeed = 5, alienSpeed = 35, laserSpeed = 5;
 
-int[][] alienXPos = {new int[numOfAliensPerRow], new int[numOfAliensPerRow], new int[numOfAliensPerRow], new int[numOfAliensPerRow], new int[numOfAliensPerRow]};
-int[][] alienYPos = {new int[numOfAliensPerRow], new int[numOfAliensPerRow], new int[numOfAliensPerRow], new int[numOfAliensPerRow], new int[numOfAliensPerRow]};
-boolean[][] alienAlive = {new boolean[numOfAliensPerRow], new boolean[numOfAliensPerRow], new boolean[numOfAliensPerRow], new boolean[numOfAliensPerRow], new boolean[numOfAliensPerRow]};
-
-//int numOfRows = 5;
-//int[][] alienXPos = new int[numOfRows][numOfAliensPerRow];
-//int[][] alienYPos = new int[numOfRows][numOfAliensPerRow];
-//boolean[][] alienAlive = new boolean[numOfRows][numOfAliensPerRow];
+int[][] alienXPos = new int[numOfRows][numOfAliensPerRow];
+int[][] alienYPos = new int[numOfRows][numOfAliensPerRow];
+boolean[][] alienAlive = new boolean[numOfRows][numOfAliensPerRow];
 
 int laserXPos, laserYPos;
 
@@ -55,33 +44,25 @@ int numberOfAliensAlive;
 
 void setup() {
   size(800,800);
-  //alien = loadImage("alien.PNG");
-  //alien1 = loadImage("alien1.PNG");
-  alien = loadImage("alien.png");
-  alien1 = loadImage("alien1.png");
+  alienA = loadImage("alienA.png");
+  alienB = loadImage("alienB.png");
+  alien1A = loadImage("alien1A.png");
+  alien1B = loadImage("alien1B.png");
+  alien2A = loadImage("alien2A.png");
+  alien2B = loadImage("alien2B.png");
+  
   tank = loadImage("tank.png");
+  
+  logo = loadImage("logo.png");
+  
+  alienA.resize(30,24);
+  alienB.resize(30,24);
+  
   textAlign(CENTER,CENTER);
   imageMode(CENTER);
   rectMode(CENTER);
   
   initialize();
-  //for(int i = 0; i < 5; i++) {
-  //  for(int j = 0; j < numOfAliensPerRow; j++) {
-  //    alienAlive[i][j] = true;
-  //  }
-  //}
-  
-  //for(int i = 0; i < 5; i++) {
-  //  for(int j = 0; j < numOfAliensPerRow; j++) {
-  //    alienXPos[i][j] = j*50 + 150;
-  //  }
-  //}
-  
-  //for(int i = 0; i < 5; i++) {
-  //  for(int j = 0; j < numOfAliensPerRow; j++) {
-  //    alienYPos[i][j] = i*35 + 50; //i*35 instead of j*35
-  //  }
-  //}
 
   gameState = 0;
 }
@@ -102,10 +83,9 @@ void draw() {
 }
 
 void mainMenu() {
-  // Add SpaceInvaders logo PImage
-  // image()
-  
   background(#000000);
+  image(logo,400,200);
+  
   fill(#FFFFFF);
   rect(400,400,100,30);
   rect(400,450,100,30);
@@ -128,9 +108,6 @@ void instructions() {
 }
 
 void game() {
-  //println(alienHittingMaxYLevel());
-  //println(alienYPos[4][0]);
-  
   background(#000000);
   image(tank,tankXPos,tankYPos);
   drawAliens();
@@ -159,9 +136,6 @@ void game() {
     gameState = 3;
     //lose condition
   }
-
-  //println(playerScore);
-  //println(numberOfAliensAlive);
 }
 
 void endgame() {
@@ -181,6 +155,11 @@ void endgame() {
 }
 
 void initialize() {
+  // Variable reset:
+  alienSpeed = 35;
+  playerScore = 0;
+  
+  // Alien Reset:
   for(int i = 0; i < 5; i++) {
     for(int j = 0; j < numOfAliensPerRow; j++) {
       alienAlive[i][j] = true;
@@ -214,18 +193,26 @@ void drawAliens() {
     for(int j = 0; j < numOfAliensPerRow; j++) {
       if(alienAlive[i][j]) {
         if(animationState == 0) {
-          //if(i == 0) {
-            //draw first row alien
-          //}
-          //if(i == 1 || i == 2) {
-            image(alien,alienXPos[i][j],alienYPos[i][j]);
-          //}
-          //if(i == 3 || i == 4) {
-            //draw third and fourth row alien
-          //}
+          if(i == 0) {
+            image(alienA,alienXPos[i][j],alienYPos[i][j]);
+          }
+          if(i == 1 || i == 2) {
+            image(alien1A,alienXPos[i][j],alienYPos[i][j]);
+          }
+          if(i == 3 || i == 4) {
+            image(alien2A,alienXPos[i][j],alienYPos[i][j]);
+          }
         } 
         else if(animationState == 1) {
-          image(alien1,alienXPos[i][j],alienYPos[i][j]);
+          if(i == 0) {
+            image(alienB,alienXPos[i][j],alienYPos[i][j]);
+          }
+          if(i == 1 || i == 2) {
+            image(alien1B,alienXPos[i][j],alienYPos[i][j]);
+          }
+          if(i == 3 || i == 4) {
+            image(alien2B,alienXPos[i][j],alienYPos[i][j]);
+          }        
         }
       }
     }
@@ -290,8 +277,6 @@ void checkAlienHittingWall() {
   }
   
   for(int i = 0; i < 5; i++) {
-    //println(furthestAlienAliveLeftIndex);
-    //println(alienXPos[i][furthestAlienAliveRightIndex]);
     if(alienXPos[i][furthestAlienAliveLeftIndex]-alienWidth/2 < 0) {
       for(int j = 0; j < numOfAliensPerRow; j++) {
         alienYPos[i][j] += 35;
@@ -321,7 +306,6 @@ void checkLaserCollision() {
     for(int j = 0; j < numOfAliensPerRow; j++) {
       //if(alienAlive[i][j] && (laserXPos-laserWidth/2 > alienXPos[i][j]-alienWidth/2 && laserXPos+laserWidth/2 < alienXPos[i][j]+alienWidth/2) && (laserYPos > alienYPos[i][j]-alienHeight/2 && laserYPos < alienYPos[i][j]+alienHeight/2)) {
       if(alienAlive[i][j] && abs(laserXPos-alienXPos[i][j]) < 25 && abs(laserYPos-alienYPos[i][j]) < 15) {
-        //println("hit");
         laserOnScreen = false;
         alienAlive[i][j] = false;
         numberOfAliensAlive--;
@@ -349,16 +333,6 @@ void checkLaserCollision() {
 //}
 
 void keyPressed() {
-  //if(keyCode == 37) {
-  //  tankLeft = true;
-  //}
-  //if(keyCode == 39) {
-  //  tankRight = true;
-  //}
-  //if(keyCode == 32) {
-  //  shootLaser = true;
-  //}
-  
   switch(keyCode) {
     case 37:
       tankLeft = true;
@@ -370,10 +344,6 @@ void keyPressed() {
       shootLaser = true;
       break;
   }
-  //if(keyCode == 10 && gameState == 0) { // Press enter to start game
-  //  gameState = 2;
-  //}
-  //println(keyCode);
 
   // For testing:
   if(keyCode == 9) {
@@ -382,16 +352,6 @@ void keyPressed() {
 }
 
 void keyReleased() {
-  //if(keyCode == 37) {
-  //  tankLeft = false;
-  //}
-  //if(keyCode == 39) {
-  //  tankRight = false;
-  //}
-  //if(keyCode == 32) {
-  //  shootLaser = false;
-  //}
-  
   switch(keyCode) {
     case 37:
       tankLeft = false;
