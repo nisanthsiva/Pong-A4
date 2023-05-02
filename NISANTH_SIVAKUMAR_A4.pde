@@ -367,6 +367,7 @@ void keyReleased() {
 
 void mousePressed() {
   if(gameState == 0 && mouseX > 350 && mouseX < 450 && mouseY > 385 && mouseY < 415) { // "Play" to start
+    initialize();
     gameState = 2;
   }
   if(gameState == 0 && mouseX > 350 && mouseX < 450 && mouseY > 435 && mouseY < 465) { // "Instructions" to go to instructions 
