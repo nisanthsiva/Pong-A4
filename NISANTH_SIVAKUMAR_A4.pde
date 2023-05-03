@@ -12,18 +12,20 @@ int tankXPos = 400, tankYPos = 700;
 int tankHeight = 28, tankWidth = 45;
 int alienWidth = 30, alienHeight = 22;
 
-int laserWidth = 4, laserHeight = 26;
+int laserWidth = 4, laserHeight = 26, alienLaserWidth = 4, alienLaserHeight = 15;
+int numOfAlienLasers = 0;
 
 int numOfRows = 5;
 int numOfAliensPerRow = 11;
 
-int tankSpeed = 5, alienSpeed = 35, laserSpeed = 5;
+int tankSpeed = 5, alienSpeed = 35, laserSpeed = 10, alienLaserSpeed = 10;
 
 int[][] alienXPos = new int[numOfRows][numOfAliensPerRow];
 int[][] alienYPos = new int[numOfRows][numOfAliensPerRow];
 boolean[][] alienAlive = new boolean[numOfRows][numOfAliensPerRow];
 
 int laserXPos, laserYPos;
+int alienLaserXPos, alienLaserYPos;
 
 int currentTime;
 
@@ -126,6 +128,16 @@ void game() {
     moveLaser();
     checkLaserCollision();
   }
+  
+  if(numOfAlienLasers < 3) {
+    alienLaserXPos = alienXPos[int(random(0,numOfRows))][int(random(0,numOfAliensPerRow))];
+    alienLaserYPos = alienYPos[int(random(0,numOfRows))][int(random(0,numOfAliensPerRow))];
+    drawAlienLaser(alienLaserXPos,alienLaserYPos,alienLaserWidth,alienLaserHeight);
+    moveAlienLaser();
+    numOfAlienLasers++;
+    checkAlienLaserCollision();
+  }
+  println(numOfAlienLasers);
   
   if(numberOfAliensAlive <= 0) {
     gameState = 3;
@@ -301,6 +313,15 @@ void moveLaser() {
   laserYPos -= laserSpeed;
 }
 
+void drawAlienLaser(int x, int y, int w, int h) {
+  fill(#1CFF62);
+  rect(x,y,w,h);
+}
+
+void moveAlienLaser() {
+  alienLaserYPos += alienLaserSpeed;
+}
+
 void checkLaserCollision() {
   for(int i = 0; i < 5; i++) {
     for(int j = 0; j < numOfAliensPerRow; j++) {
@@ -325,6 +346,12 @@ void checkLaserCollision() {
   
   if(laserYPos-laserHeight/2 < 0) {
     laserOnScreen = false;
+  }
+}
+
+void checkAlienLaserCollision() {
+  if(alienLaserYPos > height) {
+    numOfAlienLasers--;
   }
 }
 
