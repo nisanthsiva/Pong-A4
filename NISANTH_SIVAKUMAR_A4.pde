@@ -24,8 +24,12 @@ int[][] alienXPos = new int[numOfRows][numOfAliensPerRow];
 int[][] alienYPos = new int[numOfRows][numOfAliensPerRow];
 boolean[][] alienAlive = new boolean[numOfRows][numOfAliensPerRow];
 
+int[] alienLaserXPos = new int[3];
+int[] alienLaserYPos = new int[3];
+boolean[] alienLaserAlive = new boolean[3];
+
 int laserXPos, laserYPos;
-int alienLaserXPos, alienLaserYPos;
+//int alienLaserXPos, alienLaserYPos;
 
 int currentTime;
 
@@ -39,6 +43,8 @@ int furthestAlienAliveRightIndex = 10;
 int furthestAlienAliveLeftIndex = 0;
 
 boolean laserOnScreen = false;
+
+boolean shootAlienLaser = false;
 
 int playerScore = 0;
 
@@ -129,14 +135,25 @@ void game() {
     checkLaserCollision();
   }
   
-  if(numOfAlienLasers < 3) {
-    alienLaserXPos = alienXPos[int(random(0,numOfRows))][int(random(0,numOfAliensPerRow))];
-    alienLaserYPos = alienYPos[int(random(0,numOfRows))][int(random(0,numOfAliensPerRow))];
-    drawAlienLaser(alienLaserXPos,alienLaserYPos,alienLaserWidth,alienLaserHeight);
-    moveAlienLaser();
-    numOfAlienLasers++;
-    checkAlienLaserCollision();
+  for(int i = 0; i < 3; i++) {
+    for(int j = 0; j < 3; j++) {
+      //alienLaserXPos[i][j] = alienXPos[int(random(0,numOfRows))][int(random(0,numOfAliensPerRow))];
+      //alienLaserYPos[i][j] = alienYPos[int(random(0,numOfRows))][int(random(0,numOfAliensPerRow))];
+    }
   }
+  
+  //if(numOfAlienLasers < 1) {
+  //  shootAlienLaser = true;
+  //  alienLaserXPos = alienXPos[int(random(0,numOfRows))][int(random(0,numOfAliensPerRow))];
+  //  alienLaserYPos = alienYPos[int(random(0,numOfRows))][int(random(0,numOfAliensPerRow))];
+  //}
+  
+  //if(shootAlienLaser) {
+  //  drawAlienLaser(alienLaserXPos,alienLaserYPos,alienLaserWidth,alienLaserHeight);
+  //  moveAlienLaser();
+  //  numOfAlienLasers++;
+  //  checkAlienLaserCollision();
+  //}
   println(numOfAlienLasers);
   
   if(numberOfAliensAlive <= 0) {
