@@ -1,6 +1,9 @@
 // Add small delay when aliens hit wall and change y-level
 // Fix dimensions of tank
 
+// Bug: laser speed increeases with more lasers on the screen.
+// Add player lives
+
 PImage alienA, alienB, alien1A, alien1B, alien2A, alien2B;
 PImage tank;
 PImage logo;
@@ -18,7 +21,7 @@ int numOfAlienLasers = 0;
 int numOfRows = 5;
 int numOfAliensPerRow = 11;
 
-int tankSpeed = 5, alienSpeed = 35, laserSpeed = 10, alienLaserSpeed = 10;
+int tankSpeed = 5, alienSpeed = 35, laserSpeed = 10, alienLaserSpeed = 1;
 
 int[][] alienXPos = new int[numOfRows][numOfAliensPerRow];
 int[][] alienYPos = new int[numOfRows][numOfAliensPerRow];
@@ -29,7 +32,6 @@ int[] alienLaserYPos = new int[3];
 boolean[] alienLaserAlive = new boolean[3];
 
 int laserXPos, laserYPos;
-//int alienLaserXPos, alienLaserYPos;
 
 int currentTime;
 
@@ -49,6 +51,10 @@ boolean shootAlienLaser = false;
 int playerScore = 0;
 
 int numberOfAliensAlive;
+
+int alienLaserTimer = 0;
+
+int playerLives;
 
 void setup() {
   size(800,800);
@@ -136,32 +142,34 @@ void game() {
   }
   
   for(int i = 0; i < 3; i++) {
-    for(int j = 0; j < 3; j++) {
-      //alienLaserXPos[i][j] = alienXPos[int(random(0,numOfRows))][int(random(0,numOfAliensPerRow))];
-      //alienLaserYPos[i][j] = alienYPos[int(random(0,numOfRows))][int(random(0,numOfAliensPerRow))];
+    if(millis() - alienLaserTimer > int(random(2,6))*1000) {
+      if(numOfAlienLasers < 3 && !alienLaserAlive[i]) {
+        alienLaserXPos[i] = alienXPos[int(random(0,numOfRows))][int(random(0,numOfAliensPerRow))];
+        alienLaserYPos[i] = alienYPos[int(random(0,numOfRows))][int(random(0,numOfAliensPerRow))];
+        drawAlienLaser(alienLaserXPos[i],alienLaserYPos[i],alienLaserWidth,alienLaserHeight);
+        alienLaserAlive[i] = true;
+        numOfAlienLasers++;
+        alienLaserTimer = millis();
+      }
     }
   }
   
-  //if(numOfAlienLasers < 1) {
-  //  shootAlienLaser = true;
-  //  alienLaserXPos = alienXPos[int(random(0,numOfRows))][int(random(0,numOfAliensPerRow))];
-  //  alienLaserYPos = alienYPos[int(random(0,numOfRows))][int(random(0,numOfAliensPerRow))];
-  //}
-  
-  //if(shootAlienLaser) {
-  //  drawAlienLaser(alienLaserXPos,alienLaserYPos,alienLaserWidth,alienLaserHeight);
-  //  moveAlienLaser();
-  //  numOfAlienLasers++;
-  //  checkAlienLaserCollision();
-  //}
-  println(numOfAlienLasers);
+  for(int i = 0; i < 3; i++) {
+    if(alienLaserAlive[i]) {
+      drawAlienLaser(alienLaserXPos[i],alienLaserYPos[i],alienLaserWidth,alienLaserHeight);
+      moveAlienLaser();
+      checkAlienLaserCollision();
+    }
+  }
+
+  //println(numOfAlienLasers);
   
   if(numberOfAliensAlive <= 0) {
     gameState = 3;
     //win condition
   }
   
-  if(alienHittingMaxYLevel()) {
+  if(alienHittingMaxYLevel() || playerLives <= 0) {
     gameState = 3;
     //lose condition
   }
@@ -187,6 +195,7 @@ void initialize() {
   // Variable reset:
   alienSpeed = 35;
   playerScore = 0;
+  playerLives = 3;
   
   // Alien Reset:
   for(int i = 0; i < 5; i++) {
@@ -335,8 +344,11 @@ void drawAlienLaser(int x, int y, int w, int h) {
   rect(x,y,w,h);
 }
 
-void moveAlienLaser() {
-  alienLaserYPos += alienLaserSpeed;
+// Bug: laser speed increases with more lasers on screen.
+void moveAlienLaser() { // <-- fix  
+  for(int i = 0; i < 3; i++) {
+    alienLaserYPos[i] += alienLaserSpeed;
+  }
 }
 
 void checkLaserCollision() {
@@ -367,8 +379,16 @@ void checkLaserCollision() {
 }
 
 void checkAlienLaserCollision() {
-  if(alienLaserYPos > height) {
-    numOfAlienLasers--;
+  for(int i = 0; i < 3; i++) {
+    if(alienLaserAlive[i] && alienLaserXPos[i] > tankXPos-tankWidth/2 && alienLaserXPos[i] < tankXPos+tankWidth/2 && alienLaserYPos[i]-alienLaserHeight/2 > tankYPos-tankHeight/2 && alienLaserYPos[i]+alienLaserHeight/2 < tankYPos+tankHeight/2) {
+      playerLives--;  
+      println("tank hit");
+    }
+    
+    if(alienLaserAlive[i] && alienLaserYPos[i] > height) {
+      alienLaserAlive[i] = false;
+      numOfAlienLasers--;
+    }
   }
 }
 
