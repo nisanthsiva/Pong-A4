@@ -2,7 +2,8 @@
 // Fix dimensions of tank
 
 // Bug: laser speed increeases with more lasers on the screen.
-// Add player lives
+
+// Make alien laser collision better
 
 PImage alienA, alienB, alien1A, alien1B, alien2A, alien2B;
 PImage tank;
@@ -21,7 +22,7 @@ int numOfAlienLasers = 0;
 int numOfRows = 5;
 int numOfAliensPerRow = 11;
 
-int tankSpeed = 5, alienSpeed = 35, laserSpeed = 10, alienLaserSpeed = 1;
+int tankSpeed = 5, alienSpeed = 35, laserSpeed = 8, alienLaserSpeed = 1;
 
 int[][] alienXPos = new int[numOfRows][numOfAliensPerRow];
 int[][] alienYPos = new int[numOfRows][numOfAliensPerRow];
@@ -128,6 +129,9 @@ void game() {
   moveTank();
   moveAliens();
   checkNumberOfAliensAlive();
+  
+  drawScore();
+  drawLives();
   
   if(shootLaser && !laserOnScreen) {
     laserOnScreen = true;
@@ -346,6 +350,11 @@ void drawAlienLaser(int x, int y, int w, int h) {
 
 // Bug: laser speed increases with more lasers on screen.
 void moveAlienLaser() { // <-- fix  
+  //println(alienLaserSpeed);
+  //for(int i = 0; i < 3; i++) {
+  //  alienLaserYPos[i] += alienLaserSpeed;
+  //}
+  //println(millis());
   for(int i = 0; i < 3; i++) {
     alienLaserYPos[i] += alienLaserSpeed;
   }
@@ -381,6 +390,8 @@ void checkLaserCollision() {
 void checkAlienLaserCollision() {
   for(int i = 0; i < 3; i++) {
     if(alienLaserAlive[i] && alienLaserXPos[i] > tankXPos-tankWidth/2 && alienLaserXPos[i] < tankXPos+tankWidth/2 && alienLaserYPos[i]-alienLaserHeight/2 > tankYPos-tankHeight/2 && alienLaserYPos[i]+alienLaserHeight/2 < tankYPos+tankHeight/2) {
+      alienLaserAlive[i] = false;
+      numOfAlienLasers--;
       playerLives--;  
       println("tank hit");
     }
@@ -390,6 +401,16 @@ void checkAlienLaserCollision() {
       numOfAlienLasers--;
     }
   }
+}
+
+void drawScore() {
+  fill(#FFFFFF);
+  text("Score: " + playerScore,50,50);
+}
+
+void drawLives() {
+  fill(#FFFFFF);
+  text("Lives: " + playerLives,50,750);
 }
 
 //void shootLaser() { 
