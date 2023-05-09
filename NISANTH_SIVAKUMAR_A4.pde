@@ -6,6 +6,7 @@
 // Make alien laser collision better
 
 PImage alienA, alienB, alien1A, alien1B, alien2A, alien2B;
+PImage UFO;
 PImage tank;
 PImage logo;
 
@@ -57,6 +58,11 @@ int alienLaserTimer = 0;
 
 int playerLives;
 
+boolean UFOVisible = false;
+int UFOWidth = 60, UFOHeight = 26;
+int UFOXPos = 0-UFOWidth/2, UFOYPos = 400, UFOSpeed = 2;
+int UFOTimer = 0;
+
 void setup() {
   size(800,800);
   alienA = loadImage("alienA.png");
@@ -65,6 +71,8 @@ void setup() {
   alien1B = loadImage("alien1B.png");
   alien2A = loadImage("alien2A.png");
   alien2B = loadImage("alien2B.png");
+  
+  UFO = loadImage("UFO.png");
   
   tank = loadImage("tank.png");
   
@@ -166,7 +174,17 @@ void game() {
     }
   }
 
-  //println(numOfAlienLasers);
+  if(UFOVisible) {
+    drawUFO();
+    moveUFO();
+    checkUFOCollision();
+  }
+  
+  //println(millis()-UFOTimer);
+  if(millis() - UFOTimer > int(random(15,20))*1000) {
+    UFOVisible = true;
+    //UFOTimer = millis();
+  }
   
   if(numberOfAliensAlive <= 0) {
     gameState = 3;
@@ -400,6 +418,30 @@ void checkAlienLaserCollision() {
       alienLaserAlive[i] = false;
       numOfAlienLasers--;
     }
+  }
+}
+
+void drawUFO() {
+  image(UFO,UFOXPos,UFOYPos);
+}
+
+void moveUFO() {
+  UFOXPos += UFOSpeed;
+}
+
+void checkUFOCollision() {
+  //if(UFOXPos-UFOWidth/2 < 0) {
+  //  UFOSpeed = abs(UFOSpeed);
+  //}
+  //if(UFOXPos+UFOWidth/2 > width) {
+  //  UFOSpeed = -abs(UFOSpeed);
+  //}
+  
+  // Waits for entire UFO to leave the screen
+  if(UFOXPos-UFOWidth/2 > width) {
+    UFOVisible = false;
+    UFOTimer = millis();
+    UFOXPos = 0-UFOWidth/2;
   }
 }
 
