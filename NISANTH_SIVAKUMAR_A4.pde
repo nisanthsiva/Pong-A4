@@ -5,6 +5,8 @@
 
 // Make alien laser collision better
 
+// Add levels, highscore screen, shields 
+
 PImage alienA, alienB, alien1A, alien1B, alien2A, alien2B;
 PImage UFO;
 PImage tank;
@@ -62,6 +64,8 @@ boolean UFOVisible = false;
 int UFOWidth = 60, UFOHeight = 26;
 int UFOXPos = 0-UFOWidth/2, UFOYPos = 400, UFOSpeed = 2;
 int UFOTimer = 0;
+
+boolean playerWon = false;
 
 void setup() {
   size(800,800);
@@ -121,7 +125,15 @@ void instructions() {
   // Add instructions/how to play, rules
   background(#000000);
   fill(#FFFFFF);
-  text("instructions",400,400);
+  textSize(28);
+  text("How To Play",400,100);
+  textSize(12);
+  text("instructions",400,200);
+  text("",400,300);
+  text("",400,400);
+  text("",400,500);
+  text("",400,600);
+  text("",400,700);
   
   // Return to menu:
   fill(#FFFFFF);
@@ -181,19 +193,20 @@ void game() {
   }
   
   //println(millis()-UFOTimer);
-  if(millis() - UFOTimer > int(random(15,20))*1000) {
+  if(millis() - UFOTimer > int(random(20,30))*1000) {
+  //if(millis() - UFOTimer > int(random(5,10))*1000) {
     UFOVisible = true;
     //UFOTimer = millis();
   }
   
+  // win condition
   if(numberOfAliensAlive <= 0) {
     gameState = 3;
-    //win condition
   }
   
+  // lose condition
   if(alienHittingMaxYLevel() || playerLives <= 0) {
     gameState = 3;
-    //lose condition
   }
 }
 
@@ -202,8 +215,12 @@ void endgame() {
   fill(#FFFFFF);
   text("Game Over",400,400);
 
-  // if(won) {}
-  // else if(lose) {}
+  if(playerWon) {
+    text("Won",400,500);
+  }
+  else if(!playerWon) {
+    text("Lose",400,500);
+  }
 
   fill(#FFFFFF);
   rect(400,500,100,30);
@@ -218,6 +235,15 @@ void initialize() {
   alienSpeed = 35;
   playerScore = 0;
   playerLives = 3;
+  playerWon = false;
+  UFOTimer = millis();
+  alienLaserTimer = millis();
+  UFOXPos = 0-UFOWidth/2;
+  
+  // Alien Laser Reset:
+  for(int i = 0; i < 3; i++) {
+    alienLaserAlive[i] = false;
+  }
   
   // Alien Reset:
   for(int i = 0; i < 5; i++) {
@@ -430,18 +456,22 @@ void moveUFO() {
 }
 
 void checkUFOCollision() {
-  //if(UFOXPos-UFOWidth/2 < 0) {
-  //  UFOSpeed = abs(UFOSpeed);
-  //}
-  //if(UFOXPos+UFOWidth/2 > width) {
-  //  UFOSpeed = -abs(UFOSpeed);
-  //}
-  
   // Waits for entire UFO to leave the screen
   if(UFOXPos-UFOWidth/2 > width) {
     UFOVisible = false;
     UFOTimer = millis();
     UFOXPos = 0-UFOWidth/2;
+  }
+  
+  // Laser collision with UFO
+  int[] UFOScore = {50,100,150,200,300};
+  
+  if(laserXPos > UFOXPos-UFOWidth/2 && laserXPos < UFOXPos+UFOWidth/2 && laserYPos > UFOYPos-UFOHeight/2 && laserYPos < UFOYPos+UFOHeight/2) {
+    UFOVisible = false;
+    UFOTimer = millis();
+    UFOXPos = 0-UFOWidth/2;
+    playerScore += UFOScore[int(random(0,5))];
+    laserOnScreen = false;
   }
 }
 
