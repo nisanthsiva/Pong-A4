@@ -6,6 +6,7 @@
 // Make alien laser collision better
 
 // Add levels, highscore screen, shields 
+// Make alien speed scale with level by changing time between movements not actual speed
 
 PImage alienA, alienB, alien1A, alien1B, alien2A, alien2B;
 PImage UFO;
@@ -62,10 +63,13 @@ int playerLives;
 
 boolean UFOVisible = false;
 int UFOWidth = 60, UFOHeight = 26;
-int UFOXPos = 0-UFOWidth/2, UFOYPos = 400, UFOSpeed = 2;
+int UFOXPos = 0-UFOWidth/2, UFOYPos = 100, UFOSpeed = 2;
 int UFOTimer = 0;
 
-boolean playerWon = false;
+int gameCondition = 0;
+// 0 = null, 1 = won, 2 = lose
+
+int level = 1;
 
 void setup() {
   size(800,800);
@@ -152,6 +156,7 @@ void game() {
   
   drawScore();
   drawLives();
+  drawLevel();
   
   if(shootLaser && !laserOnScreen) {
     laserOnScreen = true;
@@ -202,11 +207,13 @@ void game() {
   // win condition
   if(numberOfAliensAlive <= 0) {
     gameState = 3;
+    gameCondition = 1;
   }
   
   // lose condition
   if(alienHittingMaxYLevel() || playerLives <= 0) {
     gameState = 3;
+    gameCondition = 2;
   }
 }
 
@@ -215,14 +222,28 @@ void endgame() {
   fill(#FFFFFF);
   text("Game Over",400,400);
 
-  if(playerWon) {
-    text("Won",400,500);
+  if(gameCondition == 1) {
+    win();  
   }
-  else if(!playerWon) {
-    text("Lose",400,500);
+  else if(gameCondition == 2) {
+    lose();
+    
   }
+}
 
+void win() {
+  background(#000000);
   fill(#FFFFFF);
+  text("Level Cleared",400,500);
+  rect(400,500,100,30);
+  fill(#000000);
+  text("Next Level",400,500);
+}
+
+void lose() {
+  background(#000000);
+  fill(#FFFFFF);
+  text("Lose",400,500);
   rect(400,500,100,30);
   rect(400,550,120,30);
   fill(#000000);
@@ -232,13 +253,47 @@ void endgame() {
 
 void initialize() {
   // Variable reset:
+  level = 1;
   alienSpeed = 35;
-  playerScore = 0;
+  playerScore = 0; 
   playerLives = 3;
-  playerWon = false;
-  UFOTimer = millis();
+  gameCondition = 0; 
+  UFOTimer = millis(); 
   alienLaserTimer = millis();
   UFOXPos = 0-UFOWidth/2;
+  
+  // Alien Laser Reset:
+  for(int i = 0; i < 3; i++) {
+    alienLaserAlive[i] = false;
+  }
+  
+  // Alien Reset:
+  for(int i = 0; i < 5; i++) {
+    for(int j = 0; j < numOfAliensPerRow; j++) {
+      alienAlive[i][j] = true;
+    }
+  }
+  
+  for(int i = 0; i < 5; i++) {
+    for(int j = 0; j < numOfAliensPerRow; j++) {
+      alienXPos[i][j] = j*50 + 150;
+    }
+  }
+  
+  for(int i = 0; i < 5; i++) {
+    for(int j = 0; j < numOfAliensPerRow; j++) {
+      alienYPos[i][j] = i*35 + 50; //i*35 instead of j*35
+    }
+  }
+}
+
+void nextLevel() {
+  level++;
+  alienSpeed = 35;
+  gameCondition = 0; 
+  UFOTimer = millis(); 
+  alienLaserTimer = millis(); 
+  UFOXPos = 0-UFOWidth/2; 
   
   // Alien Laser Reset:
   for(int i = 0; i < 3; i++) {
@@ -485,6 +540,11 @@ void drawLives() {
   text("Lives: " + playerLives,50,750);
 }
 
+void drawLevel() {
+  fill(#FFFFFF);
+  text("Level: " + level,700,50);
+}
+
 //void shootLaser() { 
 //  shootLaser = false;
 //}
@@ -505,6 +565,7 @@ void keyPressed() {
   // For testing:
   if(keyCode == 9) {
     gameState = 3;
+    gameCondition = 1;
   }
 }
 
@@ -533,11 +594,15 @@ void mousePressed() {
   if(gameState == 1 && mouseX > 340 && mouseX < 460 && mouseY > 585 && mouseY < 615) { // "Return to main menu" from instructions to go back to menu
     gameState = 0;
   }
-  if(gameState == 3 && mouseX > 340 && mouseX < 460 && mouseY > 485 && mouseY < 515) { // "Play again" to restart game
+  if(gameState == 3 && gameCondition == 2 && mouseX > 340 && mouseX < 460 && mouseY > 485 && mouseY < 515) { // "Play again" to restart game
     initialize();
     gameState = 2;
   }
-  if(gameState == 3 && mouseX > 340 && mouseX < 460 && mouseY > 435 && mouseY < 565) { // "Return to main menu" to return to menu after game ends
+  if(gameState == 3 && gameCondition == 2 && mouseX > 340 && mouseX < 460 && mouseY > 435 && mouseY < 565) { // "Return to main menu" to return to menu after game ends
     gameState = 0;
+  }
+  if(gameState == 3 && gameCondition == 1 && mouseX > 350 && mouseX < 450 && mouseY > 485 && mouseY < 515) { // "Next Level" if player won
+    nextLevel();
+    gameState = 2;
   }
 }
