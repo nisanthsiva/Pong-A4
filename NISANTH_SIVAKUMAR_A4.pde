@@ -5,7 +5,11 @@
 
 // Make alien laser collision better
 
+// Add levels, highscore screen, shields 
+// Make alien speed scale with level by changing time between movements not actual speed
+
 PImage alienA, alienB, alien1A, alien1B, alien2A, alien2B;
+PImage UFO;
 PImage tank;
 PImage logo;
 
@@ -57,6 +61,16 @@ int alienLaserTimer = 0;
 
 int playerLives;
 
+boolean UFOVisible = false;
+int UFOWidth = 60, UFOHeight = 26;
+int UFOXPos = 0-UFOWidth/2, UFOYPos = 100, UFOSpeed = 2;
+int UFOTimer = 0;
+
+int gameCondition = 0;
+// 0 = null, 1 = won, 2 = lose
+
+int level = 1;
+
 void setup() {
   size(800,800);
   alienA = loadImage("alienA.png");
@@ -65,6 +79,8 @@ void setup() {
   alien1B = loadImage("alien1B.png");
   alien2A = loadImage("alien2A.png");
   alien2B = loadImage("alien2B.png");
+  
+  UFO = loadImage("UFO.png");
   
   tank = loadImage("tank.png");
   
@@ -113,7 +129,15 @@ void instructions() {
   // Add instructions/how to play, rules
   background(#000000);
   fill(#FFFFFF);
-  text("instructions",400,400);
+  textSize(28);
+  text("How To Play",400,100);
+  textSize(12);
+  text("instructions",400,200);
+  text("",400,300);
+  text("",400,400);
+  text("",400,500);
+  text("",400,600);
+  text("",400,700);
   
   // Return to menu:
   fill(#FFFFFF);
@@ -132,6 +156,7 @@ void game() {
   
   drawScore();
   drawLives();
+  drawLevel();
   
   if(shootLaser && !laserOnScreen) {
     laserOnScreen = true;
@@ -166,16 +191,29 @@ void game() {
     }
   }
 
-  //println(numOfAlienLasers);
-  
-  if(numberOfAliensAlive <= 0) {
-    gameState = 3;
-    //win condition
+  if(UFOVisible) {
+    drawUFO();
+    moveUFO();
+    checkUFOCollision();
   }
   
+  //println(millis()-UFOTimer);
+  if(millis() - UFOTimer > int(random(20,30))*1000) {
+  //if(millis() - UFOTimer > int(random(5,10))*1000) {
+    UFOVisible = true;
+    //UFOTimer = millis();
+  }
+  
+  // win condition
+  if(numberOfAliensAlive <= 0) {
+    gameState = 3;
+    gameCondition = 1;
+  }
+  
+  // lose condition
   if(alienHittingMaxYLevel() || playerLives <= 0) {
     gameState = 3;
-    //lose condition
+    gameCondition = 2;
   }
 }
 
@@ -184,10 +222,28 @@ void endgame() {
   fill(#FFFFFF);
   text("Game Over",400,400);
 
-  // if(won) {}
-  // else if(lose) {}
+  if(gameCondition == 1) {
+    win();  
+  }
+  else if(gameCondition == 2) {
+    lose();
+    
+  }
+}
 
+void win() {
+  background(#000000);
   fill(#FFFFFF);
+  text("Level Cleared",400,500);
+  rect(400,500,100,30);
+  fill(#000000);
+  text("Next Level",400,500);
+}
+
+void lose() {
+  background(#000000);
+  fill(#FFFFFF);
+  text("Lose",400,500);
   rect(400,500,100,30);
   rect(400,550,120,30);
   fill(#000000);
@@ -197,9 +253,52 @@ void endgame() {
 
 void initialize() {
   // Variable reset:
+  level = 1;
   alienSpeed = 35;
-  playerScore = 0;
+  playerScore = 0; 
   playerLives = 3;
+  gameCondition = 0; 
+  UFOTimer = millis(); 
+  alienLaserTimer = millis();
+  UFOXPos = 0-UFOWidth/2;
+  
+  // Alien Laser Reset:
+  for(int i = 0; i < 3; i++) {
+    alienLaserAlive[i] = false;
+  }
+  
+  // Alien Reset:
+  for(int i = 0; i < 5; i++) {
+    for(int j = 0; j < numOfAliensPerRow; j++) {
+      alienAlive[i][j] = true;
+    }
+  }
+  
+  for(int i = 0; i < 5; i++) {
+    for(int j = 0; j < numOfAliensPerRow; j++) {
+      alienXPos[i][j] = j*50 + 150;
+    }
+  }
+  
+  for(int i = 0; i < 5; i++) {
+    for(int j = 0; j < numOfAliensPerRow; j++) {
+      alienYPos[i][j] = i*35 + 50; //i*35 instead of j*35
+    }
+  }
+}
+
+void nextLevel() {
+  level++;
+  alienSpeed = 35;
+  gameCondition = 0; 
+  UFOTimer = millis(); 
+  alienLaserTimer = millis(); 
+  UFOXPos = 0-UFOWidth/2; 
+  
+  // Alien Laser Reset:
+  for(int i = 0; i < 3; i++) {
+    alienLaserAlive[i] = false;
+  }
   
   // Alien Reset:
   for(int i = 0; i < 5; i++) {
@@ -407,6 +506,34 @@ void checkAlienLaserCollision() {
   }
 }
 
+void drawUFO() {
+  image(UFO,UFOXPos,UFOYPos);
+}
+
+void moveUFO() {
+  UFOXPos += UFOSpeed;
+}
+
+void checkUFOCollision() {
+  // Waits for entire UFO to leave the screen
+  if(UFOXPos-UFOWidth/2 > width) {
+    UFOVisible = false;
+    UFOTimer = millis();
+    UFOXPos = 0-UFOWidth/2;
+  }
+  
+  // Laser collision with UFO
+  int[] UFOScore = {50,100,150,200,300};
+  
+  if(laserXPos > UFOXPos-UFOWidth/2 && laserXPos < UFOXPos+UFOWidth/2 && laserYPos > UFOYPos-UFOHeight/2 && laserYPos < UFOYPos+UFOHeight/2) {
+    UFOVisible = false;
+    UFOTimer = millis();
+    UFOXPos = 0-UFOWidth/2;
+    playerScore += UFOScore[int(random(0,5))];
+    laserOnScreen = false;
+  }
+}
+
 void drawScore() {
   fill(#FFFFFF);
   text("Score: " + playerScore,50,50);
@@ -415,6 +542,11 @@ void drawScore() {
 void drawLives() {
   fill(#FFFFFF);
   text("Lives: " + playerLives,50,750);
+}
+
+void drawLevel() {
+  fill(#FFFFFF);
+  text("Level: " + level,700,50);
 }
 
 //void shootLaser() { 
@@ -437,6 +569,7 @@ void keyPressed() {
   // For testing:
   if(keyCode == 9) {
     gameState = 3;
+    gameCondition = 1;
   }
 }
 
@@ -465,11 +598,15 @@ void mousePressed() {
   if(gameState == 1 && mouseX > 340 && mouseX < 460 && mouseY > 585 && mouseY < 615) { // "Return to main menu" from instructions to go back to menu
     gameState = 0;
   }
-  if(gameState == 3 && mouseX > 340 && mouseX < 460 && mouseY > 485 && mouseY < 515) { // "Play again" to restart game
+  if(gameState == 3 && gameCondition == 2 && mouseX > 340 && mouseX < 460 && mouseY > 485 && mouseY < 515) { // "Play again" to restart game
     initialize();
     gameState = 2;
   }
-  if(gameState == 3 && mouseX > 340 && mouseX < 460 && mouseY > 435 && mouseY < 565) { // "Return to main menu" to return to menu after game ends
+  if(gameState == 3 && gameCondition == 2 && mouseX > 340 && mouseX < 460 && mouseY > 435 && mouseY < 565) { // "Return to main menu" to return to menu after game ends
     gameState = 0;
+  }
+  if(gameState == 3 && gameCondition == 1 && mouseX > 350 && mouseX < 450 && mouseY > 485 && mouseY < 515) { // "Next Level" if player won
+    nextLevel();
+    gameState = 2;
   }
 }
