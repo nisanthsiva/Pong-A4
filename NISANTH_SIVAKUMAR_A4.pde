@@ -150,7 +150,7 @@ void game() {
       if(numOfAlienLasers < 3 && !alienLaserAlive[i]) {
         alienLaserXPos[i] = alienXPos[int(random(0,numOfRows))][int(random(0,numOfAliensPerRow))];
         alienLaserYPos[i] = alienYPos[int(random(0,numOfRows))][int(random(0,numOfAliensPerRow))];
-        drawAlienLaser(alienLaserXPos[i],alienLaserYPos[i],alienLaserWidth,alienLaserHeight);
+        //drawAlienLaser(alienLaserXPos[i],alienLaserYPos[i],alienLaserWidth,alienLaserHeight);
         alienLaserAlive[i] = true;
         numOfAlienLasers++;
         alienLaserTimer = millis();
@@ -350,16 +350,20 @@ void drawAlienLaser(int x, int y, int w, int h) {
 
 // Bug: laser speed increases with more lasers on screen.
 void moveAlienLaser() { // <-- fix  
-  //println(alienLaserSpeed);
-  //for(int i = 0; i < 3; i++) {
-  //  alienLaserYPos[i] += alienLaserSpeed;
+  //if(numOfAlienLasers == 1) {
+  //  alienLaserSpeed = 3;
   //}
-  //println(millis());
+  //else if(numOfAlienLasers == 2) {
+  //  alienLaserSpeed = 2;
+  //}
+  //else if(numOfAlienLasers == 3) {
+  //  alienLaserSpeed = 1;
+  //}
   for(int i = 0; i < 3; i++) {
     alienLaserYPos[i] += alienLaserSpeed;
   }
 }
-
+ 
 void checkLaserCollision() {
   for(int i = 0; i < 5; i++) {
     for(int j = 0; j < numOfAliensPerRow; j++) {
