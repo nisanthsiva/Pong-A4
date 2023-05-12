@@ -1,4 +1,5 @@
 // Add small delay when aliens hit wall and change y-level
+// Alien clipping into wall
 
 // Bug: laser speed increases with more lasers on the screen.
 
@@ -37,7 +38,7 @@ boolean[] alienLaserAlive = new boolean[3];
 
 int shieldYPos = 650;
 int[] shieldXPos = new int[4];
-int[] shieldLives = new int[4];
+int[] shieldHealth = new int[4];
 int shieldWidth = 100, shieldHeight = 75;
 
 int laserXPos, laserYPos;
@@ -138,12 +139,12 @@ void instructions() {
   textSize(28);
   text("How To Play",400,100);
   textSize(12);
-  text("instructions",400,200);
-  text("",400,300);
-  text("",400,400);
-  text("",400,500);
-  text("",400,600);
-  text("",400,700);
+  text("Use Left Arrow and Right Arrow control the tank.",400,200);
+  text("Use spacebar to shoot the aliens. The goal of the game is to",400,250);
+  text("stop the aliens from reaching the bottom of the screen.",400,300);
+  text("Once all aliens have been cleared from the screen,",400,350);
+  text("you can move on to the next level which will have increasing difficulty.",400,400);
+  text("",400,450);
   
   // Return to menu:
   fill(#FFFFFF);
@@ -153,8 +154,7 @@ void instructions() {
 }
 
 void game() {  
-  
-  println(shieldLives);
+  println(shieldHealth);
   
   background(#000000);
   image(tank,tankXPos,tankYPos);
@@ -167,7 +167,7 @@ void game() {
   drawScore();
   drawLives();
   drawLevel();
-  
+
   if(shootLaser && !laserOnScreen) {
     laserOnScreen = true;
     laserXPos = tankXPos;
@@ -244,7 +244,7 @@ void endgame() {
 void win() {
   background(#000000);
   fill(#FFFFFF);
-  text("Level Cleared",400,500);
+  text("Level Cleared",400,300);
   rect(400,500,100,30);
   fill(#000000);
   text("Next Level",400,500);
@@ -253,7 +253,7 @@ void win() {
 void lose() {
   background(#000000);
   fill(#FFFFFF);
-  text("Lose",400,500);
+  text("Game Over",400,400);
   rect(400,500,100,30);
   rect(400,550,120,30);
   fill(#000000);
@@ -300,8 +300,8 @@ void initialize() {
   
   // Shield Reset:
   for(int i = 0; i < 4; i++) {
-    shieldXPos[i] = i*150 + 200;
-    shieldLives[i] = 4;
+    shieldXPos[i] = i*200 + 100;
+    shieldHealth[i] = 4;
   }
 }
 
@@ -337,6 +337,12 @@ void nextLevel() {
     for(int j = 0; j < numOfAliensPerRow; j++) {
       alienYPos[i][j] = i*35 + 100; 
     }
+  }
+  
+  // Shield Reset:
+  for(int i = 0; i < 4; i++) {
+    shieldXPos[i] = i*200 + 100;
+    shieldHealth[i] = 4;
   }
 }
 
@@ -413,7 +419,7 @@ void checkNumberOfAliensAlive() {
 boolean alienHittingMaxYLevel() {
   for(int i = 0; i < 5; i++) {
     for(int j = 0; j < numOfAliensPerRow; j++) {
-      if(alienAlive[i][j] && alienYPos[i][j] > 500) {
+      if(alienAlive[i][j] && alienYPos[i][j] > 600) {
         return(true);
       } 
     }
@@ -506,7 +512,7 @@ void checkLaserCollision() {
   }
   
   for(int i = 0; i < 4; i++) {
-    if(abs(laserXPos-shieldXPos[i]) < shieldWidth/2 && abs(laserYPos-shieldYPos) < shieldHeight/2) {
+    if(shieldHealth[i] > 0 && abs(laserXPos-shieldXPos[i]) < shieldWidth/2 && abs(laserYPos-shieldYPos) < shieldHeight/2) {
       laserOnScreen = false;
     }
   }
@@ -531,10 +537,10 @@ void checkAlienLaserCollision() {
     }
     
     for(int j = 0; j < 4; j++) {
-      if(alienLaserAlive[i] && abs(alienLaserXPos[i]-shieldXPos[j]) < shieldWidth/2 && abs(alienLaserYPos[i]-shieldYPos) < shieldHeight/2) {
+      if(alienLaserAlive[i] && shieldHealth[j] > 0 && abs(alienLaserXPos[i]-shieldXPos[j]) < shieldWidth/2 && abs(alienLaserYPos[i]-shieldYPos) < shieldHeight/2) {
         alienLaserAlive[i] = false;
         numOfAlienLasers--;
-        shieldLives[j]--;
+        shieldHealth[j]--;
       }
     }
   }
@@ -570,7 +576,7 @@ void checkUFOCollision() {
 
 void drawShields() {
   for(int i = 0; i < 4; i++) {
-    if(shieldLives[i] > 0) {
+    if(shieldHealth[i] > 0) {
       image(shield,shieldXPos[i],shieldYPos);
     }
   }
