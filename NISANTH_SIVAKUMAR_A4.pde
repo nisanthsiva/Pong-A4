@@ -87,6 +87,11 @@ void setup() {
   size(800,800);
   
   rect(400,400,100,100);
+  int asdf = 0;
+  rect(asdf,asdf,100,100);
+  for(int i =0; i < 100; i++) {
+    println(i);
+  }
   
   // Loading images for sprites
   alienA = loadImage("alienA.png");
