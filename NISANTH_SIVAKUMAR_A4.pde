@@ -86,7 +86,16 @@ int[] highscore = new int[1];
 void setup() {
   size(800,800);
   
+<<<<<<< HEAD
   triangle(100,200,300,400,500,600);
+=======
+  rect(400,400,100,100);
+  int asdf = 0;
+  rect(asdf,asdf,100,100);
+  for(int i =0; i < 100; i++) {
+    println(i);
+  }
+>>>>>>> 6694a335c5acf39f1ed44c00acf24fad0507fb4d
   
   // Loading images for sprites
   alienA = loadImage("alienA.png");
