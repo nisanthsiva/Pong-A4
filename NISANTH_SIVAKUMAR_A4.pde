@@ -86,6 +86,8 @@ int[] highscore = new int[1];
 void setup() {
   size(800,800);
   
+  triangle(100,200,300,400,500,600);
+  
   // Loading images for sprites
   alienA = loadImage("alienA.png");
   alienB = loadImage("alienB.png");
