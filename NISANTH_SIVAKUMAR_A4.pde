@@ -9,7 +9,7 @@
     Left and Right arrows to control the tank.
     Spacebar to shoot lasers.
 */
-//...
+
 // Images for sprites
 PImage alienA, alienB, alien1A, alien1B, alien2A, alien2B;
 PImage UFO;
@@ -85,6 +85,8 @@ int[] highscore = new int[1];
 
 void setup() {
   size(800,800);
+  
+  rect(400,400,100,100);
   
   // Loading images for sprites
   alienA = loadImage("alienA.png");
